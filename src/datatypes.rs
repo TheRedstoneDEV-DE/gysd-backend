@@ -1,4 +1,16 @@
 use rocket::serde::{Deserialize, Serialize};
+use rocket_db_pools::{sqlx, Database};
+
+#[derive(Database)]
+#[database("sqlite_db")]
+pub struct Db(sqlx::SqlitePool);
+
+
+#[derive(Deserialize, Serialize)]
+pub struct Login {
+    pub username: String,
+    pub password: String
+}
 
 #[derive(Deserialize, Serialize)]
 pub struct TimeOfDay {

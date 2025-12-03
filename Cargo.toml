@@ -5,7 +5,9 @@ edition = "2024"
 
 [dependencies]
 argon2 = "0.5.3"
-rocket = "0.5.1"
-rusqlite = "0.37.0"
+rand_core = { version = "0.9.3", features = ["os_rng"] }
+rocket = { version = "0.5.1", features = ["json"]}
+rocket_db_pools = { version = "0.2.0", features=["sqlx_sqlite"] }
 serde = "1.0.228"
-uuid = "1.19.0"
+sqlx = { version = "0.7.0", features = ["runtime-tokio", "sqlite"] }
+uuid = { version = "1.19.0", features = ["v4"] }

@@ -1,1 +1,7 @@
 /target
+
+.session
+.view
+.fuse_*
+
+data.sqlite
