@@ -13,26 +13,27 @@ pub struct Login {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct TimeOfDay {
-    pub hour: u8,
-    pub minute: u8,
-    pub second: u8
+pub struct UserData {
+    pub missions: Option<Vec<Mission>>,
+    pub quicks: Option<Vec<Quick>>,
+    pub habits: Option<Vec<Habit>>
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct Interval {
     pub day: u8,
-    pub month: u8,  // Since months have uneven days
-    pub year: u8    // Sunce years also have uneven days
+    pub month: u8,              // Since months have uneven days
+    pub year: u8                // Sunce years also have uneven days
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct Mission {
+    pub id: i64,
     pub name: String,
-    pub priority: i8,
-    pub time: TimeOfDay,
-    pub duration: Option<TimeOfDay>,
-    pub repeat: Option<Interval>,
+    pub priority: i64,          // low 0 - 10 high
+    pub time: i64,              // UNIX time
+    pub duration: Option<i64>,  // minutes
+    pub repeat: Option<i64>,    // positive - days | negative - months
     pub is_preset: bool
 }
 
@@ -40,7 +41,7 @@ pub struct Mission {
 pub struct Quick {
     pub name: String,
     pub description: String,
-    pub reminder: Option<TimeOfDay>
+    pub reminder: Option<u16>   // minutes
 }
 
 #[derive(Deserialize, Serialize)]
