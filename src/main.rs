@@ -34,6 +34,18 @@ async fn run_migrations(pool: &sqlx::SqlitePool) {
                 ON DELETE CASCADE
                 ON UPDATE CASCADE
         );
+        CREATE TABLE IF NOT EXISTS quicks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            added_timestamp INTEGER NOT NULL,
+            reminder INTEGER,
+            FOREIGN KEY (user_id)
+                REFERENCES users(uuid)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
+        );
         "#
     )
     .execute(pool)
