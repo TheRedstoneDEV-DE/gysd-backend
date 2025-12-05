@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO missions (name, priority, time, duration, repeat, is_preset, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "d373fe648ad3ff3a08aafd9d340a2718c6ead2683150b10a126f4cc78dff9684"
+}

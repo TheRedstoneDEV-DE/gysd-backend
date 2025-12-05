@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, name, priority, time, duration, repeat, is_preset FROM missions WHERE user_id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "priority",
+        "ordinal": 2,
+        "type_info": "Int64"
+      },
+      {
+        "name": "time",
+        "ordinal": 3,
+        "type_info": "Int64"
+      },
+      {
+        "name": "duration",
+        "ordinal": 4,
+        "type_info": "Int64"
+      },
+      {
+        "name": "repeat",
+        "ordinal": 5,
+        "type_info": "Int64"
+      },
+      {
+        "name": "is_preset",
+        "ordinal": 6,
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "164b17a10811992d5ae2e77bc76a5a0cececc2de37ee2a987424e91c514cce48"
+}

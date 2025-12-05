@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, name, streak, last_completed, nag_time FROM habits WHERE user_id = ? AND id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "streak",
+        "ordinal": 2,
+        "type_info": "Int64"
+      },
+      {
+        "name": "last_completed",
+        "ordinal": 3,
+        "type_info": "Int64"
+      },
+      {
+        "name": "nag_time",
+        "ordinal": 4,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "f7cda1e0719d9b9b94756bae057669851673942961bd056a52357b8690bd6e80"
+}

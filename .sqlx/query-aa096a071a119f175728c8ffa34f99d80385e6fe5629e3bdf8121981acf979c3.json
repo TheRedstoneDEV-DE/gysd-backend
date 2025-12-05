@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO quicks (name, added_timestamp, reminder, user_id) VALUES (?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "aa096a071a119f175728c8ffa34f99d80385e6fe5629e3bdf8121981acf979c3"
+}

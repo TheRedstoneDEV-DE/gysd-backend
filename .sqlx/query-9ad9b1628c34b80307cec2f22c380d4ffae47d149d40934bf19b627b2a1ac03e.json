@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO habits (name, streak, last_completed, nag_time, user_id) VALUES (?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "9ad9b1628c34b80307cec2f22c380d4ffae47d149d40934bf19b627b2a1ac03e"
+}

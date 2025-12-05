@@ -1,17 +1,17 @@
 use rocket::{routes, get, post};
-use rocket::serde::json;
 use rocket::http::{CookieJar, Status};
-use crate::datatypes::{Quick, Db};
+use rocket::serde::json;
+use crate::datatypes::{Habit, Db};
 use crate::helpers;
 use rocket_db_pools::Connection;
 
 #[get("/get?<id>")]
-pub async fn get_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<json::Json<Quick>> {
+pub async fn get_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<json::Json<Habit>> {
     let auth_uuid = jar.get("auth")?.value().to_string();
-    
+
     let row = sqlx::query_as!(
-        Quick,
-        "SELECT id, name, added_timestamp, reminder FROM quicks WHERE user_id = ? AND id = ?",
+        Habit,
+        "SELECT id, name, streak, last_completed, nag_time FROM habits WHERE user_id = ? AND id = ?",
         auth_uuid,
         id
     )
@@ -20,10 +20,11 @@ pub async fn get_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> 
     .ok()??;
 
     Some(json::Json(row))
+
 }
 
 #[post("/post", format="json", data="<data>")]
-pub async fn put_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Quick>) -> Option<Status> {
+pub async fn put_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Habit>) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
         return Some(Status::Forbidden)
@@ -31,10 +32,11 @@ pub async fn put_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::
     
     if data.id == 0 {
         sqlx::query!(
-            "INSERT INTO quicks (name, added_timestamp, reminder, user_id) VALUES (?, ?, ?, ?)",
+            "INSERT INTO habits (name, streak, last_completed, nag_time, user_id) VALUES (?, ?, ?, ?, ?)",
             data.name,
-            data.added_timestamp,
-            data.reminder,
+            data.streak,
+            data.last_completed,
+            data.nag_time,
             auth_uuid
         )
         .execute(&mut **db)
@@ -42,10 +44,11 @@ pub async fn put_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::
         return Some(Status::Ok)
     } else {
         sqlx::query!(
-            "UPDATE quicks SET name = ?, added_timestamp = ?, reminder = ? WHERE user_id = ? AND id = ?",
+            "UPDATE habits SET name = ?, streak = ?, last_completed = ?, nag_time = ? WHERE user_id = ? AND id = ?",
             data.name,
-            data.added_timestamp,
-            data.reminder,
+            data.streak,
+            data.last_completed,
+            data.nag_time,
             auth_uuid,
             data.id
         )
@@ -56,14 +59,14 @@ pub async fn put_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::
 }
 
 #[get("/delete?<id>")]
-pub async fn delete_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<Status> {
+pub async fn delete_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
         return Some(Status::Forbidden)
     }
 
     sqlx::query!(
-        "DELETE FROM quicks WHERE id = ? AND user_id = ?",
+        "DELETE FROM habits WHERE id = ? AND user_id = ?",
         id,
         auth_uuid
     )
@@ -74,5 +77,5 @@ pub async fn delete_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) 
 }
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![get_quick, put_quick, delete_quick]
+    routes![get_habit, put_habit, delete_habit]
 }

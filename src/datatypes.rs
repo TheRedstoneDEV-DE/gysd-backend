@@ -41,19 +41,15 @@ pub struct Mission {
 pub struct Quick {
     pub id: i64,
     pub name: String,
-    pub description: String,
     pub added_timestamp: i64,   // UNIX-Timestamp 
-    pub reminder: Option<u16>   // minutes
+    pub reminder: Option<i64>   // minutes
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct Habit {
     pub id: i64,
     pub name: String,
-    pub tracked_sites: Vec<String>, // List of tracked websites
-    pub time_limit: i64,            // minutes
-    pub streak: i64,                // days
-    pub last_completed: i64,        // UNIX-Timestamp
-    pub completed_today: bool,
-    pub nag_interval: i64           // minutes 
+    pub streak: i64,            // days
+    pub last_completed: i64,    // UNIX-Timestamp
+    pub nag_time: Option<i64>   // UNIX-Timestamp
 }

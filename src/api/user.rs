@@ -66,14 +66,16 @@ pub async fn login(db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Log
 }
 
 #[get("/get_data")]
-pub async fn get_data(db: Connection<Db>, jar: &CookieJar<'_>) -> Option<json::Json<UserData>> {
+pub async fn get_data(mut db: Connection<Db>, jar: &CookieJar<'_>) -> Option<json::Json<UserData>> {
     let auth_uuid = jar.get("auth")?.value().to_string();
-    let missions = helpers::get_missions(auth_uuid, db).await;
+    let missions = helpers::get_missions(auth_uuid.clone(), &mut db).await;
+    let quicks = helpers::get_quicks(auth_uuid.clone(), &mut db).await;
+    let habits = helpers::get_habits(auth_uuid, &mut db).await;
 
     Some(rocket::serde::json::Json(UserData{
         missions: missions,
-        quicks: None,
-        habits: None
+        quicks: quicks,
+        habits: habits
     }))
 }
 

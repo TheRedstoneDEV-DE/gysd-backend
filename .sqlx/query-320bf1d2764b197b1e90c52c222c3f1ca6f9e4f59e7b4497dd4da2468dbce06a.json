@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE habits SET name = ?, streak = ?, last_completed = ?, nag_time = ? WHERE user_id = ? AND id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "320bf1d2764b197b1e90c52c222c3f1ca6f9e4f59e7b4497dd4da2468dbce06a"
+}

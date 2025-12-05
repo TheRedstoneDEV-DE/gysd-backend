@@ -1,6 +1,7 @@
 use rocket::{self, launch};
 use rocket_db_pools::Database;
 use rocket::fairing::AdHoc;
+use rocket::fs::FileServer;
 
 use crate::datatypes::Db;
 
@@ -38,9 +39,20 @@ async fn run_migrations(pool: &sqlx::SqlitePool) {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT NOT NULL,
             name TEXT NOT NULL,
-            description TEXT NOT NULL,
             added_timestamp INTEGER NOT NULL,
             reminder INTEGER,
+            FOREIGN KEY (user_id)
+                REFERENCES users(uuid)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
+        );
+        CREATE TABLE IF NOT EXISTS habits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            streak INTEGER NOT NULL DEFAULT 0,
+            last_completed INTEGER NOT NULL DEFAULT 0,
+            nag_time INTEGER,
             FOREIGN KEY (user_id)
                 REFERENCES users(uuid)
                 ON DELETE CASCADE
@@ -56,8 +68,6 @@ async fn run_migrations(pool: &sqlx::SqlitePool) {
 
 #[launch]
 async fn rocket() -> _ {
-    // TODO: mount all other API submodules
-    // TODO: add fileserver for static content
     rocket::build()
         .attach(Db::init())
         .attach(AdHoc::on_ignite("Run Migrations", |rocket| async {
@@ -67,4 +77,7 @@ async fn rocket() -> _ {
         }))
         .mount("/api/user/", api::user::routes())
         .mount("/api/mission/", api::mission::routes())
+        .mount("/api/quick/", api::quick::routes())
+        .mount("/api/habit/", api::habit::routes())
+        .mount("/", FileServer::from("static"))
 }

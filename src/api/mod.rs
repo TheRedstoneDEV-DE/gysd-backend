@@ -1,4 +1,4 @@
 pub mod mission;
-//pub mod quick;
-//pub mod habit; 
+pub mod quick;
+pub mod habit; 
 pub mod user;

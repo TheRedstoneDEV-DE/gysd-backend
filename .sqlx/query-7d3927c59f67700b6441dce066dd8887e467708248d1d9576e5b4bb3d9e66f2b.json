@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE missions SET name = ?, priority = ?, time = ?, duration = ?, repeat = ?, is_preset = ? WHERE user_id = ? AND id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "7d3927c59f67700b6441dce066dd8887e467708248d1d9576e5b4bb3d9e66f2b"
+}

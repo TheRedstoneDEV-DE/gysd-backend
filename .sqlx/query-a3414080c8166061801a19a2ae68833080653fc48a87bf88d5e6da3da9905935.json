@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE quicks SET name = ?, added_timestamp = ?, reminder = ? WHERE user_id = ? AND id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "a3414080c8166061801a19a2ae68833080653fc48a87bf88d5e6da3da9905935"
+}
