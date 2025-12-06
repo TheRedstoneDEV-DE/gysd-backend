@@ -1,11 +1,11 @@
-use rocket::{routes, get, post};
+use rocket::{routes, get, post, delete};
 use rocket::http::{CookieJar, Status};
 use rocket::serde::json;
 use crate::datatypes::{Habit, Db};
 use crate::helpers;
 use rocket_db_pools::Connection;
 
-#[get("/get?<id>")]
+#[get("/habit?<id>")]
 pub async fn get_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<json::Json<Habit>> {
     let auth_uuid = jar.get("auth")?.value().to_string();
 
@@ -23,7 +23,7 @@ pub async fn get_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> 
 
 }
 
-#[post("/post", format="json", data="<data>")]
+#[post("/habit", format="json", data="<data>")]
 pub async fn put_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Habit>) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
@@ -58,7 +58,7 @@ pub async fn put_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::
     }
 }
 
-#[get("/delete?<id>")]
+#[delete("/habit?<id>")]
 pub async fn delete_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
@@ -73,7 +73,7 @@ pub async fn delete_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) 
     .execute(&mut **db)
     .await.ok()?;
 
-    Some(Status::Ok)
+    Some(Status::NoContent)
 }
 
 pub fn routes() -> Vec<rocket::Route> {

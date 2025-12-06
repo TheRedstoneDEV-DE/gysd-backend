@@ -65,7 +65,7 @@ pub async fn login(db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Log
     return Some(Status::InternalServerError)
 }
 
-#[get("/get_data")]
+#[get("/data")]
 pub async fn get_data(mut db: Connection<Db>, jar: &CookieJar<'_>) -> Option<json::Json<UserData>> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     let missions = helpers::get_missions(auth_uuid.clone(), &mut db).await;

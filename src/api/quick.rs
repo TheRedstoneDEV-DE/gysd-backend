@@ -1,11 +1,11 @@
-use rocket::{routes, get, post};
+use rocket::{routes, get, post, delete};
 use rocket::serde::json;
 use rocket::http::{CookieJar, Status};
 use crate::datatypes::{Quick, Db};
 use crate::helpers;
 use rocket_db_pools::Connection;
 
-#[get("/get?<id>")]
+#[get("/quick?<id>")]
 pub async fn get_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<json::Json<Quick>> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     
@@ -22,7 +22,7 @@ pub async fn get_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> 
     Some(json::Json(row))
 }
 
-#[post("/post", format="json", data="<data>")]
+#[post("/quick", format="json", data="<data>")]
 pub async fn put_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Quick>) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
@@ -55,7 +55,7 @@ pub async fn put_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::
     }
 }
 
-#[get("/delete?<id>")]
+#[delete("/quick?<id>")]
 pub async fn delete_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
@@ -70,7 +70,7 @@ pub async fn delete_quick(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) 
     .execute(&mut **db)
     .await.ok()?;
 
-    Some(Status::Ok)
+    Some(Status::NoContent)
 }
 
 pub fn routes() -> Vec<rocket::Route> {

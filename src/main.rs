@@ -76,8 +76,8 @@ async fn rocket() -> _ {
             rocket
         }))
         .mount("/api/user/", api::user::routes())
-        .mount("/api/mission/", api::mission::routes())
-        .mount("/api/quick/", api::quick::routes())
-        .mount("/api/habit/", api::habit::routes())
+        .mount("/api/", api::mission::routes())
+        .mount("/api/", api::quick::routes())
+        .mount("/api/", api::habit::routes())
         .mount("/", FileServer::from("static"))
 }
