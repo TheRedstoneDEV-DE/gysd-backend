@@ -1,4 +1,5 @@
-use rocket::{routes, get, post, delete};
+use rocket::{routes, get, post, delete, State};
+use rocket::tokio::sync::broadcast::Sender;
 use rocket::http::{CookieJar, Status};
 use rocket::serde::json;
 use crate::datatypes::{Habit, Db};
@@ -24,7 +25,7 @@ pub async fn get_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> 
 }
 
 #[post("/habit", format="json", data="<data>")]
-pub async fn put_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Habit>) -> Option<Status> {
+pub async fn put_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Habit>, tx: &State<Sender<String>>) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
         return Some(Status::Forbidden)
@@ -41,7 +42,6 @@ pub async fn put_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::
         )
         .execute(&mut **db)
         .await.ok()?;
-        return Some(Status::Ok)
     } else {
         sqlx::query!(
             "UPDATE habits SET name = ?, streak = ?, last_completed = ?, nag_time = ? WHERE user_id = ? AND id = ?",
@@ -54,12 +54,16 @@ pub async fn put_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::
         )
         .execute(&mut **db)
         .await.ok()?;
-        return Some(Status::Ok)
     }
+
+    // send update event to other clients
+    let _ = tx.send(auth_uuid);
+
+    Some(Status::Ok)
 }
 
 #[delete("/habit?<id>")]
-pub async fn delete_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<Status> {
+pub async fn delete_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64, tx: &State<Sender<String>>) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
         return Some(Status::Forbidden)
@@ -72,6 +76,9 @@ pub async fn delete_habit(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) 
     )
     .execute(&mut **db)
     .await.ok()?;
+
+    // send update event to other clients
+    let _ = tx.send(auth_uuid);
 
     Some(Status::NoContent)
 }

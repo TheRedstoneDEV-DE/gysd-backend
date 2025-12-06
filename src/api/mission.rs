@@ -1,6 +1,7 @@
-use rocket::{routes, get, post, delete};
+use rocket::{routes, get, post, delete, State};
 use rocket::serde::json;
 use rocket::http::{CookieJar, Status};
+use rocket::tokio::sync::broadcast::Sender;
 use crate::datatypes::{Mission, Db};
 use crate::helpers;
 use rocket_db_pools::Connection;
@@ -23,7 +24,7 @@ Mission,
 }
 
 #[post("/mission", format="json", data="<data>")]
-pub async fn put_mission(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Mission>) -> Option<Status> {
+pub async fn put_mission(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json::Json<Mission>, tx: &State<Sender<String>>) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
         return Some(Status::Forbidden)
@@ -41,7 +42,6 @@ pub async fn put_mission(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json
         )
         .execute(&mut **db)
         .await.ok()?;
-        return Some(Status::Ok)
     } else {
         sqlx::query!(
                 "UPDATE missions SET name = ?, priority = ?, time = ?, duration = ?, repeat = ?, is_preset = ? WHERE user_id = ? AND id = ?",
@@ -56,12 +56,16 @@ pub async fn put_mission(mut db: Connection<Db>, jar: &CookieJar<'_>, data: json
             )
             .execute(&mut **db)
             .await.ok()?;
-        return Some(Status::Ok)
     }
+
+    // send update event to other clients
+    let _ = tx.send(auth_uuid);
+
+    Some(Status::Ok)
 }
 
 #[delete("/mission?<id>")]
-pub async fn delete_mission(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64) -> Option<Status> {
+pub async fn delete_mission(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64, tx: &State<Sender<String>>) -> Option<Status> {
     let auth_uuid = jar.get("auth")?.value().to_string();
     if !helpers::validate_uuid(auth_uuid.clone(), &mut db).await? {
         return Some(Status::Forbidden)
@@ -73,6 +77,9 @@ pub async fn delete_mission(mut db: Connection<Db>, jar: &CookieJar<'_>, id: i64
     )
     .execute(&mut **db)
     .await.ok()?;
+
+    // send update event to other clients
+    let _ = tx.send(auth_uuid);
 
     Some(Status::NoContent)
 }

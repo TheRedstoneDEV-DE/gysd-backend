@@ -2,6 +2,7 @@ use rocket::{self, launch};
 use rocket_db_pools::Database;
 use rocket::fairing::AdHoc;
 use rocket::fs::FileServer;
+use rocket::tokio::sync::broadcast;
 
 use crate::datatypes::Db;
 
@@ -68,6 +69,8 @@ async fn run_migrations(pool: &sqlx::SqlitePool) {
 
 #[launch]
 async fn rocket() -> _ {
+    let (tx, _rx) = broadcast::channel::<String>(100);
+
     rocket::build()
         .attach(Db::init())
         .attach(AdHoc::on_ignite("Run Migrations", |rocket| async {
@@ -75,7 +78,9 @@ async fn rocket() -> _ {
             run_migrations(db_pool).await;
             rocket
         }))
+        .manage(tx)
         .mount("/api/user/", api::user::routes())
+        .mount("/api/", api::sync::routes())
         .mount("/api/", api::mission::routes())
         .mount("/api/", api::quick::routes())
         .mount("/api/", api::habit::routes())

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      function registerUpdateAgent() {
+        let events = new EventSource("/api/update");
+        events.onmessage = (e) => {
+          console.log("Change detected:", e.data);
+          // fetch updated data here
+        };
+        
+        console.log("Registered update-Agent!");
+      }
+    </script>
+  </head> 
+</html>
